@@ -1,0 +1,2129 @@
+#include <18F4520.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#fuses NOWDT,HS, NOPUT, NOPROTECT, NODEBUG, NOLVP, NOCPD, NOWRT, BROWNOUT
+
+#use delay(clock=20000000)
+#use rs232 (baud= 9600, xmit=PIN_C7, rcv=PIN_C6, parity= N, bits=8)
+#define RS     PIN_E0
+#define ENABLE PIN_E1
+//#define LSB PIN_A2
+
+int instrucao;
+char caracter;
+int16 cont;
+char tecla='*';
+char   tecla1;
+
+void activa()
+{
+  output_high(ENABLE);
+  delay_ms(20);
+  output_low(ENABLE);
+}
+
+
+void transfere_carac(int carac)
+{
+  output_high(RS);
+  output_d(carac);
+  activa();
+}
+
+
+void transfere_inst(int inst)
+{
+  output_low(RS);
+  output_d(inst);
+  activa();
+}
+void init_lcd()
+ {
+ instrucao=56;
+  transfere_inst(instrucao);
+  instrucao=1;
+  transfere_inst(instrucao);
+  instrucao=12;
+  transfere_inst(instrucao);
+  instrucao=2;                // colocação do cursor na 1º linha
+  transfere_inst(instrucao);
+ }
+ char ler_tecla()
+{
+
+  tecla='*';
+
+  output_low(pin_b0);
+  output_high(pin_b1);
+  output_high(pin_b2);
+  output_high(pin_b3);
+
+  while((input(pin_b4)==0) && (input(pin_b4)==0) && (input(pin_b4)==0)){
+   tecla='1';
+return(tecla);
+   }
+
+  while((input(pin_b5)==0) && (input(pin_b5)==0) && (input(pin_b5)==0)){
+   tecla='4';
+return(tecla);
+   }
+
+  while((input(pin_b6)==0) && (input(pin_b6)==0) && (input(pin_b6)==0)){
+   tecla='7';
+return(tecla);
+   }
+
+  while((input(pin_b7)==0) && (input(pin_b7)==0) && (input(pin_b7)==0)){
+   tecla='A';
+return(tecla);
+   }
+
+  output_high(pin_b0);
+  output_low(pin_b1);
+  output_high(pin_b2);
+  output_high(pin_b3);
+
+  while((input(pin_b4)==0) && (input(pin_b4)==0) && (input(pin_b4)==0)){
+   tecla='2';
+return(tecla);
+   }
+
+  while((input(pin_b5)==0) && (input(pin_b5)==0) && (input(pin_b5)==0)){
+   tecla='5';
+return(tecla);
+   }
+
+  while((input(pin_b6)==0) && (input(pin_b6)==0) && (input(pin_b6)==0)){
+   tecla='8';
+return(tecla);
+    }
+
+  while((input(pin_b7)==0) && (input(pin_b7)==0) && (input(pin_b7)==0)){
+   tecla='0';
+return(tecla);
+    }
+
+
+  output_high(pin_b0);
+  output_high(pin_b1);
+  output_low(pin_b2);
+  output_high(pin_b3);
+
+
+  while((input(pin_b4)==0) && (input(pin_b4)==0) && (input(pin_b4)==0)){
+   tecla='3';
+return(tecla);
+   }
+
+   while((input(pin_b5)==0) && (input(pin_b5)==0) && (input(pin_b5)==0)){
+   tecla='6';
+return(tecla);
+   }
+
+   while((input(pin_b6)==0) && (input(pin_b6)==0) && (input(pin_b6)==0)){
+   tecla='9';
+return(tecla);
+   }
+
+   while((input(pin_b7)==0) && (input(pin_b7)==0) && (input(pin_b7)==0)){
+   tecla='B';
+return(tecla);
+   }
+
+
+  output_high(pin_b0);
+  output_high(pin_b1);
+  output_high(pin_b2);
+  output_low(pin_b3);
+
+  while((input(pin_b4)==0) && (input(pin_b4)==0) && (input(pin_b4)==0)){
+   tecla='F';
+return(tecla);
+   }
+
+  while((input(pin_b5)==0) && (input(pin_b5)==0) && (input(pin_b5)==0)){
+   tecla='E';
+return(tecla);
+   }
+
+  while((input(pin_b6)==0) && (input(pin_b6)==0) && (input(pin_b6)==0)){
+   tecla='D';
+return(tecla);
+   }
+
+  while((input(pin_b7)==0) && (input(pin_b7)==0) && (input(pin_b7)==0)){
+   tecla='C';
+return(tecla);
+   }
+ 
+}
+
+
+
+void main()
+{
+
+char T[60];
+ T="069100000000458911110000250822221500";
+   int i;
+   char k;
+char ID1[5]="0691";
+char ID2[5]="4589";
+char ID3[5]="2508";
+char string[50];
+char str1[5]="";
+char str2[5]="";
+char str3[5]="";
+char user_name[10]="";
+char readed[5]="";
+char pass1[5]="";
+char pass2[5]="";
+char pass3[5]="";
+char old_bal[5]="";
+char pass[5]="";
+int1 test1=1 , test2=1 , test3=1;
+int user=0;
+int1 test4=1;
+char operation;
+char amount[5]="";
+char new_bal[5]="";
+char ID_dest[5]="";
+char bal_dest_old[5]="";
+char bal_dest_new[5]="";
+int16 balance=0;
+int16 x=0;// old bal of card user
+int16 y=0;// amount 
+int16 z=0;// dest old balance
+int bal_pos;
+int des_bal_pos;
+int th,h,d,u;
+int1 transfer_test1=1 , transfer_test2=1 ,transfer_test3=1;
+int transfer_user=0;
+int user_nb=3;
+int j;
+char delete_nb;
+int delete_nbr;
+int length=36;
+int del_pos;
+int m;
+char usernew_ID[5];
+char usernew_pass[5];
+char usernew_bal[5];
+int MAX_USER_NB=5;
+char o;
+int v,w=0;
+set_tris_d(0x00);
+init_lcd();
+port_b_pullups(0xF0); //1-Outputs | 2-Inputs
+set_tris_b(0xF0);
+ 
+
+  while (1)
+   {
+   transfere_inst(1);
+ caracter ='I';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='T';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+caracter ='O';
+transfere_carac(caracter);
+caracter ='D';
+transfere_carac(caracter);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='C';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+transfere_inst(192);
+caracter ='C';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+caracter ='D';
+transfere_carac(caracter);
+
+delay_ms(2000);
+transfere_inst(1);
+    //************************ read the data base from eeprom ***************
+    i=0;
+for(w=0;w<=35;w++)
+{
+
+v= read_eeprom (w);
+o=v+'0';
+
+
+
+T[i]=o;
+i=i+1;
+
+}
+
+//*********** data base successfuly read****************************************
+
+   
+user=0;
+
+gets(string);
+transfere_inst(1);
+transfere_inst(128);
+for (i=14;i<=17;i++)
+{
+caracter =string[i]; // display the ID readed
+transfere_carac(caracter);
+}
+
+delay_ms(1000);
+
+for(i=0;i<=3;i++)
+{
+str1[i]=T[i];
+}
+str1[4]='\0';
+
+for(i=0;i<=3;i++)
+{
+str2[i]=T[i+12];
+}
+str2[4]='\0';
+
+for(i=0;i<=3;i++)
+{
+str3[i]=T[i+24];
+}
+str3[4]='\0';
+
+readed[0]=string[14];
+readed[1]=string[15];
+readed[2]=string[16];
+readed[3]=string[17];
+readed[4]='\0';
+
+test1=strcmp(readed, str1);
+test2=strcmp(readed, str2);
+test3=strcmp(readed, str3);
+if(0==strcmp(readed, ID1)){
+strcpy (user_name, "IVANDRO");
+}
+if(0==strcmp(readed, ID2)){
+strcpy (user_name, "CHAIMA");
+}
+if(0==strcmp(readed, ID3)){
+strcpy (user_name, "DAVID");
+}
+
+if(test1==0)
+{
+user=1;
+bal_pos=8;
+
+}
+if(test2==0)
+{
+user=2;
+bal_pos=20;
+
+}
+if(test3==0)
+{
+user=3;
+bal_pos=32;
+}
+
+if((test3!=0)&&(test1!=0)&&(test2!=0))
+{
+transfere_inst(192);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='V';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='L';
+transfere_carac(caracter);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='D';
+transfere_carac(caracter);
+delay_ms(1000);
+test4=1;
+}
+else
+{
+instrucao=1;
+transfere_inst(instrucao);
+instrucao=128;
+transfere_inst(instrucao);
+caracter ='W';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='L';
+transfere_carac(caracter);
+caracter ='C';
+transfere_carac(caracter);
+caracter ='O';
+transfere_carac(caracter);
+caracter ='M';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+transfere_inst(192);
+i=0;
+while (user_name[i] != '\0') {
+       transfere_carac(user_name[i]);
+        i++;
+    }
+delay_ms(1000);
+
+instrucao=1;
+transfere_inst(instrucao);
+instrucao=128;
+transfere_inst(instrucao);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='T';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+instrucao=192;
+transfere_inst(instrucao);
+caracter ='P';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='W';
+transfere_carac(caracter);
+caracter ='O';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+caracter ='D';
+transfere_carac(caracter);
+delay_ms(1000);
+
+transfere_inst(1);
+transfere_inst(128);
+
+//reading password from keyboard
+
+transfere_carac('P');
+transfere_carac('A');
+transfere_carac('S');
+transfere_carac('S');
+transfere_carac('=');
+   
+   for(i=0;i<4;i++){
+     ler_tecla();
+  while (tecla=='*') 
+  {
+      ler_tecla();
+ }
+ k=tecla;
+ 
+ pass[i]=k;
+transfere_carac('*');
+delay_ms(1000);
+  
+   }
+pass[4]='\0';
+
+ 
+
+//fill pass of user1
+for(i=0;i<=3;i++)
+{
+pass1[i]=T[i+4];
+}
+pass1[4]='\0';
+
+//fill pass of user2
+for(i=0;i<=3;i++)
+{
+pass2[i]=T[i+16];
+}
+pass2[4]='\0';
+
+//fill pass of user3
+for(i=0;i<=3;i++)
+{
+pass3[i]=T[i+28];
+}
+pass3[4]='\0';
+
+//comparing password readed and user password in database
+// switch user which balance to adjust or work with
+
+switch (user) {
+
+    case 1:
+          test4=strcmp(pass, pass1);
+          
+           break;
+
+    case 2:test4=strcmp(pass, pass2);
+           
+           break;
+
+    case 3:test4=strcmp(pass, pass3);
+           
+           break; }
+}
+          if(test4==0){ // if right user
+instrucao=1;
+transfere_inst(instrucao);
+instrucao=128;
+transfere_inst(instrucao); 
+caracter ='V';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='L';
+transfere_carac(caracter);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='D';
+transfere_carac(caracter); 
+transfere_carac(' '); 
+transfere_carac('P');
+transfere_carac('A');
+transfere_carac('S');
+transfere_carac('S');
+delay_ms(1000);
+
+
+
+//SELECT OPERATION
+transfere_inst(1);
+transfere_inst(128);
+caracter ='C';
+transfere_carac(caracter);
+caracter ='H';
+transfere_carac(caracter);
+caracter ='O';
+transfere_carac(caracter);
+caracter ='O';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+transfere_inst(192);
+caracter ='O';
+transfere_carac(caracter);
+caracter ='P';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='T';
+transfere_carac(caracter);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='O';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+delay_ms(1000);
+
+transfere_inst(1);
+transfere_inst(128);
+caracter ='0';
+transfere_carac(caracter);
+caracter ='-';
+transfere_carac(caracter);
+caracter ='D';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='P';
+transfere_carac(caracter);
+caracter ='O';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='T';
+transfere_carac(caracter);
+
+instrucao=192;
+transfere_inst(instrucao);
+caracter ='1';
+transfere_carac(caracter);
+caracter ='-';
+transfere_carac(caracter);
+caracter ='W';
+transfere_carac(caracter);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='T';
+transfere_carac(caracter);
+caracter ='H';
+transfere_carac(caracter);
+caracter ='D';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='W';
+transfere_carac(caracter);
+delay_ms(2000);
+instrucao=1;
+transfere_inst(instrucao);
+instrucao=128;
+transfere_inst(instrucao);
+caracter ='2';
+transfere_carac(caracter);
+caracter ='-';
+transfere_carac(caracter);
+caracter ='V';
+transfere_carac(caracter);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='W';
+transfere_carac(caracter);
+caracter =' ';
+transfere_carac(caracter);
+caracter ='B';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='L';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='C';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+transfere_inst(192);
+caracter ='3';
+transfere_carac(caracter);
+caracter ='-';
+transfere_carac(caracter);
+caracter ='T';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='F';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+delay_ms(2000);
+
+if(user==1) {  //**************************** if it's the admin display 2 extra operations to add and delete users
+instrucao=1;
+transfere_inst(instrucao);
+instrucao=128;
+transfere_inst(instrucao);
+caracter ='4';
+transfere_carac(caracter);
+caracter ='-';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='D';
+transfere_carac(caracter);
+caracter ='D';
+transfere_carac(caracter);
+caracter =' ';
+transfere_carac(caracter);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+transfere_inst(192);
+caracter ='5';
+transfere_carac(caracter);
+caracter ='-';
+transfere_carac(caracter);
+caracter ='D';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='L';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='T';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter =' ';
+transfere_carac(caracter);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+delay_ms(2000);
+
+}//**************************************end admin code**********************************************
+transfere_inst(1);
+transfere_inst(128);
+caracter ='O';
+transfere_carac(caracter);
+caracter ='P';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='T';
+transfere_carac(caracter);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='O';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='=';
+transfere_carac(caracter);
+delay_ms(1000);
+
+// read operation 
+
+     ler_tecla();
+  while (tecla=='*') 
+  {
+      ler_tecla();
+ }
+operation=tecla;
+transfere_carac(operation);
+delay_ms(1000);
+transfere_inst(1);
+transfere_inst(128);
+
+  if( (operation!='0') && (operation!='1' ) && (operation!='2') &&(operation!='3' )&&(operation!='4' )&&(operation!='5' ))
+  {
+transfere_inst(1);
+transfere_inst(128);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='V';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='L';
+transfere_carac(caracter);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='D';
+transfere_carac(caracter);
+transfere_inst(192);
+caracter ='O';
+transfere_carac(caracter);
+caracter ='P';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='T';
+transfere_carac(caracter);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='O';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+
+delay_ms(1000);
+  }
+  
+   // switch operation 
+switch (operation) {
+
+    case '0': //************ Deposit
+    {
+    
+     transfere_inst(1);
+transfere_inst(128);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='M';
+transfere_carac(caracter);
+caracter ='O';
+transfere_carac(caracter);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='T';
+transfere_carac(caracter);
+caracter ='=';
+transfere_carac(caracter);
+
+
+delay_ms(1000);
+ for(i=0;i<4;i++){
+     ler_tecla();
+  while (tecla=='*') 
+  {
+      ler_tecla();
+ }
+ k=tecla;
+ 
+ amount[i]=k;
+transfere_carac(amount[i]);
+delay_ms(1000);
+  
+   }
+    
+    amount[4]='\0';
+    // put old balance in  old_bal (copy)
+    for(i=0;i<4;i++)
+    {
+    old_bal[i]=T[i+bal_pos];//old balance
+    }
+    old_bal[4]='\0';
+     transfere_inst(1);
+transfere_inst(128);
+caracter ='O';
+transfere_carac(caracter);
+caracter ='L';
+transfere_carac(caracter);
+caracter ='d';
+transfere_carac(caracter);
+caracter =' ';
+transfere_carac(caracter);
+caracter ='B';
+transfere_carac(caracter);
+caracter ='=';
+transfere_carac(caracter);
+// new_bal initialization
+new_bal="0000";
+new_bal[4]='\0';
+balance=0;
+//display old balance
+    for(i=0;i<4;i++)
+    {
+    transfere_carac(old_bal[i]);
+    }
+    delay_ms(1000);
+    // converting string amount to int y
+    i=0;
+    y=0;
+while (amount[i] != '\0') {
+        y = y * 10 + (amount[i] - '0'); // Accumulate digits
+        i++;
+    }
+    
+    // converting string old_bal to int X
+    i=0;
+    x=0;
+while (old_bal[i] != '\0') {
+        x = x * 10 + (old_bal[i] - '0'); // Accumulate digits
+        i++;
+    }
+    
+    // sum and put into balance 
+    balance= x+y;
+    //convert balance to a string and save it in new_bal and affect it in data base
+    th=balance/1000;
+
+h=(balance%1000)/100;
+
+d=((balance%1000)%100)/10;
+
+u=((balance%1000)%100)%10;
+new_bal[0]=th+48;
+new_bal[1]=h+48;
+new_bal[2]=d+48;
+new_bal[3]=u+48;
+new_bal[4]='\0';
+for(i=0;i<4;i++)
+    {
+    T[i+bal_pos]=new_bal[i];
+    }
+    
+    //affect balance to vector according to bal_pos
+    
+    // display the new balance
+     transfere_inst(1);
+transfere_inst(128);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='W';
+transfere_carac(caracter);
+caracter =' ';
+transfere_carac(caracter);
+caracter ='B';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='L';
+transfere_carac(caracter);
+caracter ='=';
+transfere_carac(caracter);
+    delay_ms(1000);
+    
+   
+    for(i=0;i<4;i++)
+    {
+    transfere_carac(new_bal[i]);
+    }
+    delay_ms(1000);
+     transfere_inst(1);
+     
+           break;
+}
+          
+    case '1':// withdraw
+{
+    
+     transfere_inst(1);
+transfere_inst(128);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='M';
+transfere_carac(caracter);
+caracter ='O';
+transfere_carac(caracter);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='T';
+transfere_carac(caracter);
+caracter ='=';
+transfere_carac(caracter);
+
+
+delay_ms(1000);
+ for(i=0;i<4;i++){
+     ler_tecla();
+  while (tecla=='*') 
+  {
+      ler_tecla();
+ }
+ k=tecla;
+ 
+ amount[i]=k;
+transfere_carac(amount[i]);
+delay_ms(1000);
+  
+   }
+    
+    amount[4]='\0';
+    // put old balance in  old_bal (copy)
+    for(i=0;i<4;i++)
+    {
+    old_bal[i]=T[i+bal_pos];//old balance
+    }
+    old_bal[4]='\0';
+     transfere_inst(1);
+transfere_inst(128);
+caracter ='O';
+transfere_carac(caracter);
+caracter ='L';
+transfere_carac(caracter);
+caracter ='d';
+transfere_carac(caracter);
+caracter =' ';
+transfere_carac(caracter);
+caracter ='B';
+transfere_carac(caracter);
+caracter ='=';
+transfere_carac(caracter);
+// new_bal initialization
+new_bal="0000";
+new_bal[4]='\0';
+balance=0;
+//display old balance
+    for(i=0;i<4;i++)
+    {
+    transfere_carac(old_bal[i]);
+    }
+    delay_ms(1000);
+    // converting string amount to int y
+    i=0;
+    y=0;
+while (amount[i] != '\0') {
+        y = y * 10 + (amount[i] - '0'); // Accumulate digits
+        i++;
+    }
+    
+    // converting string old_bal to int X
+    i=0;
+    x=0;
+while (old_bal[i] != '\0') {
+        x = x * 10 + (old_bal[i] - '0'); // Accumulate digits
+        i++;
+    }
+    
+    
+    if(y>x){// not enough balance Insufficient funds
+    transfere_inst(1);
+transfere_inst(128);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='F';
+transfere_carac(caracter);
+caracter ='F';
+transfere_carac(caracter);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='C';
+transfere_carac(caracter);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='T';
+transfere_carac(caracter);
+
+transfere_inst(192);
+caracter ='F';
+transfere_carac(caracter);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='D';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='!';
+transfere_carac(caracter);
+   delay_ms(1000);
+   
+    transfere_inst(1);
+   }
+else { // enough funds
+    balance= x-y;
+    //convert balance to a string and save it in new_bal and affect it in data base
+    th=balance/1000;
+
+h=(balance%1000)/100;
+
+d=((balance%1000)%100)/10;
+
+u=((balance%1000)%100)%10;
+new_bal[0]=th+48;
+new_bal[1]=h+48;
+new_bal[2]=d+48;
+new_bal[3]=u+48;
+new_bal[4]='\0';
+for(i=0;i<4;i++)
+    {
+    T[i+bal_pos]=new_bal[i];
+    }
+    
+    //affect balance to vector according to bal_pos
+    
+    // display the new balance
+     transfere_inst(1);
+transfere_inst(128);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='W';
+transfere_carac(caracter);
+caracter =' ';
+transfere_carac(caracter);
+caracter ='B';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='L';
+transfere_carac(caracter);
+caracter ='=';
+transfere_carac(caracter);
+    delay_ms(1000);
+    for(i=0;i<4;i++)
+    {
+    transfere_carac(new_bal[i]);
+    }
+    delay_ms(1000);
+    
+    transfere_inst(1);
+} // enough funds ends
+
+           break;
+}
+           
+
+    case '2':// view balance
+transfere_inst(1);
+transfere_inst(128);
+
+caracter ='B';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='L';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='C';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='=';
+transfere_carac(caracter);
+    delay_ms(1000);
+    for(i=0;i<4;i++)
+    {
+    transfere_carac(T[i+bal_pos]);
+    }
+    delay_ms(2000);
+    transfere_inst(1);
+    
+           break; 
+    case '3':// transfer-----------------------------------------------
+{ // code transfer begin
+transfere_inst(1);
+transfere_inst(128);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='M';
+transfere_carac(caracter);
+caracter ='O';
+transfere_carac(caracter);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='T';
+transfere_carac(caracter);
+caracter ='=';
+transfere_carac(caracter);
+
+
+delay_ms(1000);
+ for(i=0;i<4;i++){
+     ler_tecla();
+  while (tecla=='*') 
+  {
+      ler_tecla();
+ }
+ k=tecla;
+ 
+ amount[i]=k;
+transfere_carac(amount[i]);
+delay_ms(1000);
+  
+   }
+    
+    amount[4]='\0';
+// put old balance in  old_bal (copy)
+    for(i=0;i<4;i++)
+    {
+    old_bal[i]=T[i+bal_pos];//old balance
+    }
+    old_bal[4]='\0';
+     transfere_inst(1);
+transfere_inst(128);
+caracter ='O';
+transfere_carac(caracter);
+caracter ='L';
+transfere_carac(caracter);
+caracter ='d';
+transfere_carac(caracter);
+caracter =' ';
+transfere_carac(caracter);
+caracter ='B';
+transfere_carac(caracter);
+caracter ='=';
+transfere_carac(caracter);
+// new_bal initialization
+new_bal="0000";
+new_bal[4]='\0';
+balance=0;
+//display old balance
+    for(i=0;i<4;i++)
+    {
+    transfere_carac(old_bal[i]);
+    }
+    delay_ms(1000);
+// converting string amount to int y
+    i=0;
+    y=0;
+while (amount[i] != '\0') {
+        y = y * 10 + (amount[i] - '0'); // Accumulate digits
+        i++;
+    }
+    
+    // converting string old_bal to int X
+    i=0;
+    x=0;
+while (old_bal[i] != '\0') {
+        x = x * 10 + (old_bal[i] - '0'); // Accumulate digits
+        i++;
+    }
+    
+   
+    if(y>x){// not enough balance Insufficient funds
+    transfere_inst(1);
+transfere_inst(128);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='F';
+transfere_carac(caracter);
+caracter ='F';
+transfere_carac(caracter);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='C';
+transfere_carac(caracter);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='T';
+transfere_carac(caracter);
+
+transfere_inst(192);
+caracter ='F';
+transfere_carac(caracter);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='D';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='!';
+transfere_carac(caracter);
+   delay_ms(1000);
+   }
+else { // enough funds
+    // Ask Id
+    transfere_inst(1);
+transfere_inst(128);
+caracter ='D';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='T';
+transfere_carac(caracter);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+transfere_carac(caracter);
+caracter ='T';
+transfere_carac(caracter);
+caracter ='O';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+transfere_inst(192);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='D';
+transfere_carac(caracter);
+caracter ='=';
+transfere_carac(caracter);
+
+delay_ms(1000);
+ for(i=0;i<4;i++){
+     ler_tecla();
+  while (tecla=='*') 
+  {
+      ler_tecla();
+ }
+ k=tecla;
+ 
+ ID_dest[i]=k;
+transfere_carac(ID_dest[i]);
+delay_ms(1000);
+ }
+ID_dest[4]='\0';
+// compare ID with users ID in data base
+transfer_test1=strcmp(ID_dest, str1);
+transfer_test2=strcmp(ID_dest, str2);
+transfer_test3=strcmp(ID_dest, str3);
+
+
+if(transfer_test1==0)
+{
+transfer_user=1;
+des_bal_pos=8;
+
+}
+if(transfer_test2==0)
+{
+transfer_user=2;
+des_bal_pos=20;
+}
+if(transfer_test3==0)
+{
+transfer_user=3;
+des_bal_pos=32;
+
+}
+
+if((transfer_user==0)||(transfer_user==user)) //if invalid id dest
+{
+transfere_inst(1);
+transfere_inst(128);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='V';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='L';
+transfere_carac(caracter);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='D';
+transfere_carac(caracter);
+caracter =' ';
+transfere_carac(caracter);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='D';
+transfere_carac(caracter);
+
+delay_ms(1000);
+} // if invalid id destination ends
+else { //************** if valid id destination************************************************************************
+
+// add balance to the destination  ############################################################
+// put old balance of destination bal_dest_old
+    for(i=0;i<4;i++)
+    {
+    bal_dest_old[i]=T[i+des_bal_pos];//old balance
+    }
+    bal_dest_old[4]='\0';
+  // converting string ID_dest_old to int z
+    i=0;
+    z=0;
+while (bal_dest_old[i] != '\0') {
+        z = z * 10 + (bal_dest_old[i] - '0'); // Accumulate digits
+        i++;
+    }
+balance= y+z;
+//convert balance to a string and save it in bal_dest_new and affect it in data base
+    th=balance/1000;
+
+h=(balance%1000)/100;
+
+d=((balance%1000)%100)/10;
+
+u=((balance%1000)%100)%10;
+bal_dest_new[0]=th+48;
+bal_dest_new[1]=h+48;
+bal_dest_new[2]=d+48;
+bal_dest_new[3]=u+48;
+bal_dest_new[4]='\0';
+//affect new destination balance to vector according to des_bal_pos
+for(i=0;i<4;i++)
+    {
+    T[i+des_bal_pos]=bal_dest_new[i];
+    }
+    
+    
+    
+// sustract balance from user ##############################################################
+balance= x-y;
+    //convert balance to a string and save it in new_bal and affect it in data base
+    th=balance/1000;
+
+h=(balance%1000)/100;
+
+d=((balance%1000)%100)/10;
+
+u=((balance%1000)%100)%10;
+new_bal[0]=th+48;
+new_bal[1]=h+48;
+new_bal[2]=d+48;
+new_bal[3]=u+48;
+new_bal[4]='\0';
+for(i=0;i<4;i++)
+    {
+    T[i+bal_pos]=new_bal[i];
+    }
+    
+    //affect balance to vector according to bal_pos
+    
+    // display the new balance
+transfere_inst(1);
+transfere_inst(128);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='W';
+transfere_carac(caracter);
+caracter =' ';
+transfere_carac(caracter);
+caracter ='B';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='L';
+transfere_carac(caracter);
+caracter ='=';
+transfere_carac(caracter);
+delay_ms(1000);
+for(i=0;i<4;i++)
+{
+transfere_carac(new_bal[i]);
+}
+delay_ms(1000);
+
+transfere_inst(1);
+transfere_inst(128);
+caracter ='T';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='C';
+transfere_carac(caracter);
+caracter ='T';
+transfere_carac(caracter);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='O';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+transfere_inst(192);
+
+caracter ='S';
+transfere_carac(caracter);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='C';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='F';
+transfere_carac(caracter);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='L';
+transfere_carac(caracter);
+
+delay_ms(2000);
+    transfere_inst(1);
+
+ 
+
+ }//*********** if vald id dest ends****************************************
+
+    
+}// enough funds ends
+
+break;
+}// code transfer ends = case 3 ends
+case '4':// ADD USER
+{//case 4 code begins
+transfere_inst(1);
+transfere_inst(128);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter =' ';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='M';
+transfere_carac(caracter);
+caracter ='B';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+caracter ='=';
+transfere_carac(caracter);
+
+transfere_carac(user_nb+48);
+
+delay_ms(1500);
+j=0;
+// display current data base 
+transfere_inst(1);
+transfere_inst(128);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+caracter ='1';
+transfere_carac(caracter);
+caracter ='=';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='D';
+transfere_carac(caracter);
+caracter ='M';
+transfere_carac(caracter);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+transfere_inst(192);
+for(i=0;i<12;i++)
+{ transfere_carac(T[i]);
+}
+delay_ms(1500);
+j=2;
+while(j<=user_nb)
+{
+transfere_inst(1);
+transfere_inst(128);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+transfere_carac(j+48);
+transfere_carac('=');
+transfere_inst(192);
+
+for(i=(j-1)*12;i<(j*12) ;i++)
+{ transfere_carac(T[i]);
+}
+delay_ms(1500);
+j++;
+}
+// ask admin for usernew_ID 
+transfere_inst(1);
+transfere_inst(128);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='W';
+transfere_carac(caracter);
+caracter =' ';
+transfere_carac(caracter);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+transfere_inst(192);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='D';
+transfere_carac(caracter);
+caracter ='=';
+transfere_carac(caracter);
+
+delay_ms(1000);
+ for(i=0;i<4;i++){
+     ler_tecla();
+  while (tecla=='*') 
+  {
+      ler_tecla();
+ }
+ k=tecla;
+ 
+ usernew_ID[i]=k;
+transfere_carac(usernew_ID[i]);
+delay_ms(1000);
+  
+   }
+    
+    usernew_ID[4]='\0';
+
+
+//end usernew_ID/ write it in T
+for(i=0;i<4;i++){
+   T[i+length]=usernew_ID[i];
+  
+   }
+   length=length+4;
+//end 
+// ask admin for usernew_pass 
+transfere_inst(1);
+transfere_inst(128);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='W';
+transfere_carac(caracter);
+caracter =' ';
+transfere_carac(caracter);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+transfere_inst(192);
+caracter ='P';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='=';
+transfere_carac(caracter);
+delay_ms(1000);
+
+ for(i=0;i<4;i++){
+     ler_tecla();
+  while (tecla=='*') 
+  {
+      ler_tecla();
+ }
+ k=tecla;
+ 
+ usernew_pass[i]=k;
+transfere_carac(usernew_pass[i]);
+delay_ms(1000);
+  
+   }
+    
+    usernew_pass[4]='\0';
+
+
+//end usernew_pass/ write new pass in T
+for(i=0;i<4;i++){
+   T[i+length]=usernew_pass[i];
+  
+   }
+   length=length+4;
+//end 
+// ask admin for usernew_balance 
+transfere_inst(1);
+transfere_inst(128);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='W';
+transfere_carac(caracter);
+caracter =' ';
+transfere_carac(caracter);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+transfere_inst(192);
+caracter ='B';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='L';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='C';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='=';
+transfere_carac(caracter);
+delay_ms(1000);
+
+ for(i=0;i<4;i++){
+     ler_tecla();
+  while (tecla=='*') 
+  {
+      ler_tecla();
+ }
+ k=tecla;
+ 
+ usernew_bal[i]=k;
+transfere_carac(usernew_bal[i]);
+delay_ms(1000);
+  
+   }
+    
+    usernew_bal[4]='\0';
+
+
+//end usernew_pass/ write new pass in T
+for(i=0;i<4;i++){
+   T[i+length]=usernew_bal[i];
+  
+   }
+   length=length+4;
+//end 
+
+user_nb=user_nb+1;
+
+// display the new database
+transfere_inst(1);
+transfere_inst(128);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+caracter ='1';
+transfere_carac(caracter);
+caracter ='=';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='D';
+transfere_carac(caracter);
+caracter ='M';
+transfere_carac(caracter);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+transfere_inst(192);
+for(i=0;i<12;i++)
+{ transfere_carac(T[i]);
+}
+delay_ms(1500);
+j=2;
+while(j<=user_nb)
+{
+transfere_inst(1);
+transfere_inst(128);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+transfere_carac(j+48);
+transfere_carac('=');
+transfere_inst(192);
+
+for(i=(j-1)*12;i<(j*12) ;i++)
+{ transfere_carac(T[i]);
+}
+delay_ms(1500);
+j++;
+}
+
+// end displaying the new database
+
+           break; 
+}//case 4 code ends  
+case '5':// DELETE USER USER
+{//case 5 code begins
+// display current users nbr
+transfere_inst(1);
+transfere_inst(128);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter =' ';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='M';
+transfere_carac(caracter);
+caracter ='B';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+caracter ='=';
+transfere_carac(caracter);
+
+transfere_carac(user_nb+48);
+delay_ms(1500);
+j=0;
+// display current data base 
+transfere_inst(1);
+transfere_inst(128);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+caracter ='1';
+transfere_carac(caracter);
+caracter ='=';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='D';
+transfere_carac(caracter);
+caracter ='M';
+transfere_carac(caracter);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+transfere_inst(192);
+for(i=0;i<12;i++)
+{ transfere_carac(T[i]);
+}
+delay_ms(1500);
+j=2;
+while(j<=user_nb)
+{
+transfere_inst(1);
+transfere_inst(128);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+transfere_carac(j+48);
+transfere_carac('=');
+transfere_inst(192);
+
+for(i=(j-1)*12;i<(j*12);i++)
+{ transfere_carac(T[i]);
+}
+delay_ms(1500);
+j++;
+}
+
+// read user NUMBER to delete
+transfere_inst(1);
+transfere_inst(128);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+caracter =' ';
+transfere_carac(caracter);
+caracter ='T';
+transfere_carac(caracter);
+caracter ='O';
+transfere_carac(caracter);
+caracter =' ';
+transfere_carac(caracter);
+caracter ='D';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='L';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='T';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+
+transfere_inst(192);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='M';
+transfere_carac(caracter);
+caracter ='B';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+caracter ='=';
+transfere_carac(caracter);
+delay_ms(1500);
+ ler_tecla();
+  while (tecla=='*') 
+  {
+      ler_tecla();
+ }
+delete_nb=tecla;
+transfere_carac(delete_nb);
+delay_ms(1000);
+delete_nbr=delete_nb-'0';
+del_pos=(delete_nbr-1)*12;
+// delete the user 12 int = account (translate it) in user before
+i=0;
+while(i<12){
+        for ( m = del_pos; m < (del_pos+12) - 1; m++) {
+            T[m] = T[m + 12];
+        }
+        
+        
+        i++;
+    }
+length = length -12;
+
+//
+
+user_nb=user_nb-1;
+
+
+// display the new data base 
+j=0;
+// display current data base 
+transfere_inst(1);
+transfere_inst(128);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='W';
+transfere_carac(caracter);
+caracter =' ';
+transfere_carac(caracter);
+caracter ='D';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='T';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='B';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+delay_ms(1500);
+transfere_inst(1);
+transfere_inst(128);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+caracter ='1';
+transfere_carac(caracter);
+caracter ='=';
+transfere_carac(caracter);
+caracter ='A';
+transfere_carac(caracter);
+caracter ='D';
+transfere_carac(caracter);
+caracter ='M';
+transfere_carac(caracter);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+transfere_inst(192);
+for(i=0;i<12;i++)
+{ transfere_carac(T[i]);
+}
+delay_ms(1500);
+j=2;
+while(j<=user_nb)
+{
+transfere_inst(1);
+transfere_inst(128);
+caracter ='U';
+transfere_carac(caracter);
+caracter ='S';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+transfere_carac(j+48);
+transfere_carac('=');
+transfere_inst(192);
+
+for(i=(j-1)*12;i<(j*12);i++)
+{ transfere_carac(T[i]);
+}
+delay_ms(2000);
+j++;
+}
+instrucao=1;
+transfere_inst(instrucao);
+
+           break; 
+}//case 5 code ends  
+            }//switch ends
+
+          } //end if right user
+// valid user card
+//wrong entered pass
+   
+else
+{
+instrucao=1;
+transfere_inst(instrucao);
+instrucao=128;
+transfere_inst(instrucao);
+caracter ='I';
+transfere_carac(caracter);
+caracter ='N';
+transfere_carac(caracter);
+caracter ='C';
+transfere_carac(caracter);
+caracter ='O';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+caracter ='R';
+transfere_carac(caracter);
+caracter ='E';
+transfere_carac(caracter);
+caracter ='C';
+transfere_carac(caracter);
+caracter ='T';
+transfere_carac(caracter);
+delay_ms(1000);
+instrucao=1;
+transfere_inst(instrucao);
+
+}//ends else
+//******************* write database in eeprom
+  
+for(w=0;w<=36;w++)
+{
+
+o=T[w];
+        v=o-48;//put char in int
+         
+         write_eeprom(w,v);//write int 
+         
+}
+
+
+
+//********************** data base sucessfuly written in eeprom
+
+
+
+
+   }//END WHILE
+   
+}//END MAIN
+
